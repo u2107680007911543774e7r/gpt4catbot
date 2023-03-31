@@ -118,7 +118,7 @@ def thinking(update, context):
 
 def thinkingua(update, context):
     user_message = 'Tell me one demotivational and up-to-date quote in Ukrainian ' \
-                   'language, please. It should relate to cats. You can also mention the author of the quote. '
+                   'language, please. It should relate to cats or future. Do not add the translation.'
     response = openai.ChatCompletion.create(
         model=model_engine,
         messages=[
@@ -146,13 +146,14 @@ def start_bot(update, context):
     except PyMongoError as e:
         print('clear_context: not cleared')
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text='Hi! I am CatGPT! A Telegram implementation of the latest ChatGPT model.'
-                                  '\n\nSend me a message and I will respond like ChatGPT does. Maybe... Go check it! '
+                             text='I am CatGPT!\nA Telegram implementation of the latest ChatGPT model.'
+                                  '\nPlease, send me your message and I will respond better than ChatGPT does.'
+                                  '\nWell, actually, just go check it out! '
                                   '\U0001F640' +
                                   '\n\nTo reset the conversation context: /start\nContact: @t2107790007911543774e7r '
                                   '\U000000A9' +
                                   '\nDaily expression: /thinking' +
-                                  '\nDaily expression: /ua \U0001F1FA')
+                                  '\nMotivation to learn English: /ua 🇺🇦')
 
 
 # define function to convert voice message to text
