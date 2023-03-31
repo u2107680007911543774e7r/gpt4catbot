@@ -134,7 +134,6 @@ def thinkingua(update, context):
                              text=text)
 
 
-
 # Define function to start the bot
 def start_bot(update, context):
     chat_id = update.message.chat_id
@@ -147,12 +146,13 @@ def start_bot(update, context):
     except PyMongoError as e:
         print('clear_context: not cleared')
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text='Hi! I am CatGPT! A Telegram implementation of ChatGPT3.5.'
-                                  '\n Send me a message and I will respond like ChatGPT does. Maybe... Go check it! '
+                             text='Hi! I am CatGPT! A Telegram implementation of the latest ChatGPT model.'
+                                  '\n\nSend me a message and I will respond like ChatGPT does. Maybe... Go check it! '
                                   '\U0001F640' +
-                                  '\nTo reset the conversation context: /start\nContact: @t2107790007911543774e7r '
+                                  '\n\nTo reset the conversation context: /start\nContact: @t2107790007911543774e7r '
                                   '\U000000A9' +
-                                  '\nDaily expression: /thinking')
+                                  '\nDaily expression: /thinking' +
+                                  '\nDaily expression: /ua \U0001F1FA')
 
 
 # define function to convert voice message to text
