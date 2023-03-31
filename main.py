@@ -1,12 +1,11 @@
 import datetime
 import telegram
+from telegram import ChatAction, Update
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import openai
 import os
-import speech_recognition as sr
-from google.cloud import speech_v1p1beta1 as speech
 
 # Set the SSL_CERT_FILE environment variable to point to the downloaded CA certificates file
 os.environ['SSL_CERT_FILE'] = 'cacert.pem'
@@ -30,8 +29,10 @@ collection = db["messages"]
 
 # Telegram bot token
 TELEGRAM_TOKEN = '5846714506:AAGDghMQMNFyNkhjIgt7hDQcqlh3Nj64NLU'
+# TELEGRAM_TOKEN = '5978104179:AAF7ZHT6ci5jPqLhAbOnhN7upWMxbftuYNM'
 
 # OpenAI API key
+OPENAI_API_KEY = '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'
 openai.api_key = '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'
 
 # GPT-3.5 model ID
@@ -61,7 +62,7 @@ def get_context(username):
     return context
 
 
-def handle_message(update, context):
+def handle_message(update: Update, context: CallbackContext):
     # Get user info
     chat_id = update.message.chat_id
     chat = bot.get_chat(chat_id=chat_id)
@@ -74,18 +75,24 @@ def handle_message(update, context):
     # Get message from user
     user_message = update.message.text
     chat_context = get_context(username)
+    # Send the "typing" action
+    context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     # Call GPT-3.5 model to generate response
-    response = openai.ChatCompletion.create(
-        model=model_engine,
-        messages=[
-            {'role': 'system', 'content': 'You are ChatGPT implementation named CatGPT. You are a large language '
-                                          'model trained by OpenAI. You are helpful assistant. Answer as concisely as '
-                                          'possible. You should mind the context, and sometimes add "Meow" to the '
-                                          'responses.',
-             "role": "user", "content": chat_context + user_message}
-        ]
-    )
-    text = response['choices'][0]['message']['content']
+    try:
+        response = openai.ChatCompletion.create(
+            model=model_engine,
+            messages=[
+                {'role': 'system', 'content': 'You are ChatGPT implementation named CatGPT. You are a large language '
+                                              'model trained by OpenAI. You are helpful assistant. Answer as '
+                                              'concisely as possible. You should mind the context, and sometimes add '
+                                              '"Meow" to the responses.',
+                 "role": "user", "content": chat_context + user_message}
+            ]
+        )
+        text = response['choices'][0]['message']['content']
+    except openai.error.InvalidRequestError as e:
+        text = "Hey, your message is too long. This model's maximum context length is 4097 tokens. Please, reword it! :)"
+    # Make a record document for DB
     record = {
         'username': username,
         'text': user_message,
@@ -98,9 +105,13 @@ def handle_message(update, context):
     bot.send_message(chat_id=chat_id, text=text)
 
 
+def media_handler(update: Update, context: CallbackContext):
+    update.message.reply_text("Audio/Voice/Video/Sticker files are not yet supported. In progress...")
+
+
 def thinking(update, context):
-    user_message = 'Tell me one positive philosophical/psychological/technological and up-to-date quote, please. You ' \
-                   'can also mention the author of the quote. '
+    user_message = 'Tell me one inspiring, philosophical or psychological or technological or healthy and up-to-date ' \
+                   'quote, please. You can also mention the author of the quote. '
     response = openai.ChatCompletion.create(
         model=model_engine,
         messages=[
@@ -118,7 +129,7 @@ def thinking(update, context):
 
 def thinkingua(update, context):
     user_message = 'Tell me one demotivational and up-to-date quote in Ukrainian ' \
-                   'language, please. It should relate to cats or future. Do not add the translation.'
+                   'language, please. It should relate to cats, future or evolution. Do not add the translation.'
     response = openai.ChatCompletion.create(
         model=model_engine,
         messages=[
@@ -146,41 +157,14 @@ def start_bot(update, context):
     except PyMongoError as e:
         print('clear_context: not cleared')
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text='I am CatGPT!\nA Telegram implementation of the latest ChatGPT model.'
+                             text='I am CatGPT!\nA Telegram implementation of the ChatGPT 3.5 turbo model.'
                                   '\nPlease, send me your message and I will respond better than ChatGPT does.'
-                                  '\nWell, actually, just go check it out! '
+                                  '\nWell, maybe not, you tell me! '
                                   '\U0001F640' +
                                   '\n\nTo reset the conversation context: /start\nContact: @t2107790007911543774e7r '
                                   '\U000000A9' +
                                   '\nDaily expression: /thinking' +
                                   '\nMotivation to learn English: /ua 🇺🇦')
-
-
-# define function to convert voice message to text
-def transcribe_voice_message(voice_message_file):
-    # load voice message file using SpeechRecognition library
-    r = sr.Recognizer()
-    with sr.AudioFile(voice_message_file) as source:
-        audio_data = r.record(source)
-
-    # set up Google Cloud Speech-to-Text API client
-    client = speech.SpeechClient()
-    config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.OGG_OPUS,
-        language_code="und",
-        sample_rate_hertz=16000,
-    )
-    audio = speech.RecognitionAudio(content=audio_data.frame_data)
-
-    # send transcription request to Google Cloud Speech-to-Text API
-    response = client.recognize(request={"config": config, "audio": audio})
-
-    # extract transcribed text from API response
-    text = ''
-    for result in response.results:
-        text += result.alternatives[0].transcript
-
-    return text
 
 
 # Create the Updater and pass in the bot's token.
@@ -194,6 +178,10 @@ dispatcher.add_handler(CommandHandler("start", start_bot))
 dispatcher.add_handler(CommandHandler("thinking", thinking))
 dispatcher.add_handler(CommandHandler("ua", thinkingua))
 dispatcher.add_handler(MessageHandler(Filters.text, handle_message))
+dispatcher.add_handler(MessageHandler(Filters.voice, media_handler))
+dispatcher.add_handler(MessageHandler(Filters.audio, media_handler))
+dispatcher.add_handler(MessageHandler(Filters.video, media_handler))
+dispatcher.add_handler(MessageHandler(Filters.sticker, media_handler))
 
 # Start the bot
 updater.start_polling()
