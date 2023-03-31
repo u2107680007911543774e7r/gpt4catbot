@@ -1,6 +1,4 @@
 import datetime
-import pymongo as pymongo
-import requests
 import telegram
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
