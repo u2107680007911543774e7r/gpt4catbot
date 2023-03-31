@@ -11,7 +11,6 @@ from google.cloud import speech_v1p1beta1 as speech
 # Set the SSL_CERT_FILE environment variable to point to the downloaded CA certificates file
 os.environ['SSL_CERT_FILE'] = 'cacert.pem'
 
-
 # Replace the following variables with your actual MongoDB Atlas serverless credentials
 mongo_user = 'u2107680007911543774e7r'
 mongo_pass = 'evOCiYG3bpip5TB1'
@@ -100,7 +99,8 @@ def handle_message(update, context):
 
 
 def thinking(update, context):
-    user_message = 'Tell me one positive philosophical/psychological/technological and up-to-date quote to think about.'
+    user_message = 'Tell me one positive philosophical/psychological/technological and up-to-date quote, please. You ' \
+                   'can also mention the author of the quote. '
     response = openai.ChatCompletion.create(
         model=model_engine,
         messages=[
@@ -115,6 +115,26 @@ def thinking(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text=text)
 
+
+def thinkingua(update, context):
+    user_message = 'Tell me one demotivational and up-to-date quote in Ukrainian ' \
+                   'language, please. It should relate to cats. You can also mention the author of the quote. '
+    response = openai.ChatCompletion.create(
+        model=model_engine,
+        messages=[
+            {'role': 'system', 'content': 'You are ChatGPT implementation named CatGPT. You are a large language '
+                                          'model trained by OpenAI. You are helpful assistant. Answer as concisely as '
+                                          'possible. You should mind the context, and sometimes add "Meow" to the '
+                                          'responses.',
+             "role": "user", "content": user_message}
+        ]
+    )
+    text = response['choices'][0]['message']['content']
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text=text)
+
+
+
 # Define function to start the bot
 def start_bot(update, context):
     chat_id = update.message.chat_id
@@ -128,9 +148,11 @@ def start_bot(update, context):
         print('clear_context: not cleared')
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text='Hi! I am CatGPT! A Telegram implementation of ChatGPT3.5.'
-                                  '\n Send me a message and I will respond like ChatGPT does. Maybe... Go check it. u"\U0001F63D"' +
-                                  '\nTo reset the conversation context: /start\nContact: @t2107790007911543774e7r'
-                                  '\nDaily expression: /thinking' )
+                                  '\n Send me a message and I will respond like ChatGPT does. Maybe... Go check it! '
+                                  '\U0001F640' +
+                                  '\nTo reset the conversation context: /start\nContact: @t2107790007911543774e7r '
+                                  '\U000000A9' +
+                                  '\nDaily expression: /thinking')
 
 
 # define function to convert voice message to text
@@ -169,6 +191,7 @@ dispatcher = updater.dispatcher
 # Add handlers to the dispatcher
 dispatcher.add_handler(CommandHandler("start", start_bot))
 dispatcher.add_handler(CommandHandler("thinking", thinking))
+dispatcher.add_handler(CommandHandler("ua", thinkingua))
 dispatcher.add_handler(MessageHandler(Filters.text, handle_message))
 
 # Start the bot
