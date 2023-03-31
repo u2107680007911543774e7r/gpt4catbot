@@ -99,6 +99,22 @@ def handle_message(update, context):
     bot.send_message(chat_id=chat_id, text=text)
 
 
+def thinking(update, context):
+    user_message = 'Tell me one positive philosophical/psychological/technological and up-to-date quote to think about.'
+    response = openai.ChatCompletion.create(
+        model=model_engine,
+        messages=[
+            {'role': 'system', 'content': 'You are ChatGPT implementation named CatGPT. You are a large language '
+                                          'model trained by OpenAI. You are helpful assistant. Answer as concisely as '
+                                          'possible. You should mind the context, and sometimes add "Meow" to the '
+                                          'responses.',
+             "role": "user", "content": user_message}
+        ]
+    )
+    text = response['choices'][0]['message']['content']
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text=text)
+
 # Define function to start the bot
 def start_bot(update, context):
     chat_id = update.message.chat_id
@@ -112,8 +128,9 @@ def start_bot(update, context):
         print('clear_context: not cleared')
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text='Hi! I am CatGPT! A Telegram implementation of ChatGPT3.5.'
-                                  '"\n"Send me a message and I will respond like ChatGPT does. Meow :)' + '\n' +
-                                  'To reset the conversation context: /start')
+                                  '\n Send me a message and I will respond like ChatGPT does. Maybe... Go check it. u"\U0001F63D"' +
+                                  '\nTo reset the conversation context: /start\nContact: @t2107790007911543774e7r'
+                                  '\nDaily expression: /thinking' )
 
 
 # define function to convert voice message to text
@@ -151,6 +168,7 @@ dispatcher = updater.dispatcher
 
 # Add handlers to the dispatcher
 dispatcher.add_handler(CommandHandler("start", start_bot))
+dispatcher.add_handler(CommandHandler("thinking", thinking))
 dispatcher.add_handler(MessageHandler(Filters.text, handle_message))
 
 # Start the bot
