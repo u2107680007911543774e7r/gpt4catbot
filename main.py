@@ -164,7 +164,8 @@ def start_bot(update, context):
                                   '\n\nTo reset the conversation context: /start\nContact: @t2107790007911543774e7r '
                                   '\U000000A9' +
                                   '\nDaily expression: /thinking' +
-                                  '\nMotivation to learn English: /ua 🇺🇦')
+                                  '\nMotivation to learn English: /ua 🇺🇦'
+                                  '\nFree, trial version.')
 
 
 # Create the Updater and pass in the bot's token.
