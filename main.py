@@ -179,7 +179,7 @@ def start_bot(update, context):
     username = chat_id
     if chat.username:
         username = chat.username
-    if username == 't2107790007911543774e7r':
+    if username == 't2107790007911543774e7r' or username == 'zazumghb':
         try:
             collection.delete_many({'username': username})
         except PyMongoError as e:
