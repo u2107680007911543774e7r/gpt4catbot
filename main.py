@@ -81,7 +81,7 @@ def handle_message(update: Update, context: CallbackContext):
     message_count = collection.count_documents({'username': username})
     print(message_count)
     # update.message.reply_text(f'You have sent {message_count} messages.')
-    if message_count < 10:
+    if message_count < 5:
         # Send the "typing" action
         context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
         # Call GPT-3.5 model to generate response
@@ -179,7 +179,7 @@ def start_bot(update, context):
     username = chat_id
     if chat.username:
         username = chat.username
-    if username == 't2107790007911543774e7r' or username == 'zazumghb':
+    if username == 't2107790007911543774e7r':
         try:
             collection.delete_many({'username': username})
         except PyMongoError as e:
@@ -197,7 +197,7 @@ def start_bot(update, context):
                                   '\nUkrainian expressions to observe your emotions: /ua 🇺🇦'
                                   '\n\nTo reset the conversation context: /start'
                                   '\n\nMode: Free trial '
-                                  '\nLimit: 10 messages per user'
+                                  '\nLimit: 5 messages per user'
                                   '\n\nContact: @t2107790007911543774e7r')
 
 
