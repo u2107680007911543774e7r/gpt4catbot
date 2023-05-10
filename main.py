@@ -1,19 +1,18 @@
-import datetime
 import telegram
-from telegram import ChatAction, Update
-from pymongo import MongoClient
-from pymongo.errors import PyMongoError
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import openai
 import os
+from telegram import ChatAction, Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from pymongo import MongoClient
+from pymongo.errors import PyMongoError
 
 # Set the SSL_CERT_FILE environment variable to point to the downloaded CA certificates file
 os.environ['SSL_CERT_FILE'] = 'cacert.pem'
 
 # Replace the following variables with your actual MongoDB Atlas serverless credentials
-mongo_user = 'u2107680007911543774e7r'
-mongo_pass = 'evOCiYG3bpip5TB1'
-cluster_url = 'serverlessinstance0.bnnnc12.mongodb.net'
+mongo_user = 'XXX'
+mongo_pass = 'XXX'
+cluster_url = 'XXX.mongodb.net'
 
 # Create a connection string
 connection_string = f"mongodb+srv://{mongo_user}:{mongo_pass}@{cluster_url}/gpt4catbot?retryWrites=true&w=majority"
@@ -28,16 +27,14 @@ db = client["gpt4catbot"]
 collection = db["messages"]
 
 # Telegram bot token
-TELEGRAM_TOKEN = '5846714506:AAGDghMQMNFyNkhjIgt7hDQcqlh3Nj64NLU'
-# TELEGRAM_TOKEN = '5978104179:AAF7ZHT6ci5jPqLhAbOnhN7upWMxbftuYNM'
+TELEGRAM_TOKEN = 'XXX'
 
 # OpenAI API key
-OPENAI_API_KEY = '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'
-openai.api_key = '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'
+openai.api_key = 'XXX'
 
-# GPT-3.5 model ID
-model_engine = "gpt-3.5-turbo"
-# model_engine = "gpt-4"
+# GPT model ID
+#model_engine = "gpt-3.5-turbo"
+model_engine = "gpt-4"
 
 # Initialize Telegram bot
 bot = telegram.Bot(token=TELEGRAM_TOKEN)
@@ -112,7 +109,7 @@ def handle_message(update: Update, context: CallbackContext):
         # Send response back to user
         bot.send_message(chat_id=chat_id, text=text)
     else:
-        bot.send_message(chat_id=chat_id, text="You've reached the free trial limit of 10 messages. ")
+        bot.send_message(chat_id=chat_id, text="You've reached the free trial limit of 5 messages. ")
 
 
 def media_handler(update: Update, context: CallbackContext):
