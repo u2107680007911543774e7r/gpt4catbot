@@ -6,4 +6,4 @@ As statistics say, most of the users were students who asked for help with their
 
 Later it became not relevant and OpenAI released their own apps :)
 
-This project just remains to demostrates Python, TelegramBotAPI, OpenAI API, model fine-tuning skills. 
+This project just remains to demostrates Python, TelegramBotAPI, OpenAI API, MongoDB, model fine-tuning skills. 
